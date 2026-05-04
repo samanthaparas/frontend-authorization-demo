@@ -21,14 +21,18 @@ const Register = ({ handleRegistration }) => {
 
   const onRegistration = (e) => {
     e.preventDefault();
-    handleRegistration(data).then(() => {
-      setData({
-        username: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
+    handleRegistration(data)
+      .then(() => {
+        setData({
+          username: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        });
+      })
+      .catch((err) => {
+        console.error(err);
       });
-    });
   };
 
   return (
@@ -39,6 +43,7 @@ const Register = ({ handleRegistration }) => {
         <label htmlFor="username">Username:</label>
         <input
           id="username"
+          required
           name="username"
           type="text"
           value={data.username}
@@ -47,6 +52,7 @@ const Register = ({ handleRegistration }) => {
         <label htmlFor="email">Email:</label>
         <input
           id="email"
+          required
           name="email"
           type="email"
           value={data.email}
@@ -55,6 +61,7 @@ const Register = ({ handleRegistration }) => {
         <label htmlFor="password">Password:</label>
         <input
           id="password"
+          required
           name="password"
           type="password"
           value={data.password}
@@ -63,6 +70,7 @@ const Register = ({ handleRegistration }) => {
         <label htmlFor="confirmPassword">Confirm password:</label>
         <input
           id="confirmPassword"
+          required
           name="confirmPassword"
           type="password"
           value={data.confirmPassword}

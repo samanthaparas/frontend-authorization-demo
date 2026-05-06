@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { setToken, getToken } from "../utils/token";
 
 import Ducks from "./Ducks";
 import Login from "./Login";
@@ -9,6 +10,7 @@ import Register from "./Register";
 import ProtectedRoute from "./ProtectedRoute";
 
 import * as auth from "../utils/auth";
+import * as api from "../utils/api";
 
 import "./styles/App.css";
 
@@ -17,6 +19,25 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const jwt = getToken();
+
+    if (!jwt) {
+      return;
+    }
+
+    api
+      .getUserInfo(jwt)
+      .then(({ username, email }) => {
+        setIsLoggedIn(true);
+        setUserData({ username, email });
+        navigate("/ducks");
+      })
+      .catch(console.error);
+
+    // TODO - handle JWT
+  }, []);
 
   const handleLogin = ({ username, password }) => {
     if (!username || !password) {
@@ -27,6 +48,7 @@ function App() {
       .authorize(username, password)
       .then((data) => {
         if (data.jwt) {
+          setToken(data.jwt);
           setUserData(data.user);
           setIsLoggedIn(true);
           navigate("/ducks");
@@ -42,11 +64,9 @@ function App() {
     confirmPassword,
   }) => {
     if (password === confirmPassword) {
-      return auth
-        .register(username, password, email)
-        .then(() => {
-          navigate("/login");
-        });
+      return auth.register(username, password, email).then(() => {
+        navigate("/login");
+      });
     }
 
     return Promise.reject(new Error("Passwords do not match"));
